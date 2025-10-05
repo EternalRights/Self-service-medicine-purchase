@@ -1,26 +1,30 @@
 {
   "name": "vue-tlias-management",
+  "type": "module",
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --port 4173",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "postinstall": "vue-demi-switch 3 && node ./fix-vue-demi.js"
   },
   "dependencies": {
+    "vue": "^3.3.4",
+    "vue-demi": "^0.14.6",
+    "pinia": "^2.1.7",
     "@element-plus/icons-vue": "^2.3.1",
     "axios": "^1.7.2",
     "element-plus": "^2.4.4",
-    "vue": "^3.2.38",
-    "vue-router": "^4.1.5"
+    "vue-router": "^4.2.5"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.4",
-    "@vitejs/plugin-vue": "^3.0.3",
+    "@vitejs/plugin-vue": "^5.0.4",
     "@vue/eslint-config-prettier": "^7.0.0",
     "eslint": "^8.22.0",
     "eslint-plugin-vue": "^9.3.0",
     "prettier": "^2.7.1",
-    "vite": "^3.0.9"
+    "vite": "^5.1.4"
   }
 }
