@@ -159,55 +159,55 @@ router.beforeEach(async (to, from, next) => {
     document.title = to.meta.title;
   }
   
-  // 检查路由是否需要认证
-  if (to.meta.requiresAuth) {
-    // 检查用户是否登录
-    if (!authStore.isLoggedIn) {
-      // 未登录，重定向到登录页
-      ElMessage.warning('请先登录');
+  // // 检查路由是否需要认证
+  // if (to.meta.requiresAuth) {
+  //   // 检查用户是否登录
+  //   if (!authStore.isLoggedIn) {
+  //     // 未登录，重定向到登录页
+  //     ElMessage.warning('请先登录');
       
-      // 根据目标路由类型重定向到对应的登录页
-      if (to.meta.userType === 'admin') {
-        return next({ name: 'AdminLogin', query: { redirect: to.fullPath } });
-      } else {
-        return next({ name: 'Login', query: { redirect: to.fullPath } });
-      }
-    }
+  //     // 根据目标路由类型重定向到对应的登录页
+  //     if (to.meta.userType === 'admin') {
+  //       return next({ name: 'AdminLogin', query: { redirect: to.fullPath } });
+  //     } else {
+  //       return next({ name: 'Login', query: { redirect: to.fullPath } });
+  //     }
+  //   }
     
-    // 检查用户类型是否匹配
-    if (to.meta.userType && authStore.userType !== to.meta.userType) {
-      // 用户类型不匹配
-      ElMessage.error('权限不足，无法访问该页面');
+  //   // 检查用户类型是否匹配
+  //   if (to.meta.userType && authStore.userType !== to.meta.userType) {
+  //     // 用户类型不匹配
+  //     ElMessage.error('权限不足，无法访问该页面');
       
-      // 重定向到用户类型的首页
-      if (authStore.isAdmin) {
-        return next({ name: 'Dashboard' });
-      } else {
-        return next({ name: 'UserHome' });
-      }
-    }
+  //     // 重定向到用户类型的首页
+  //     if (authStore.isAdmin) {
+  //       return next({ name: 'Dashboard' });
+  //     } else {
+  //       return next({ name: 'UserHome' });
+  //     }
+  //   }
     
-    // 管理员访问管理页面时，初始化应用状态
-    if (to.meta.userType === 'admin' && !appStore.isInitialized) {
-      try {
-        await appStore.initAppState();
-      } catch (error) {
-        ElMessage.error('初始化应用状态失败: ' + error.message);
-      }
-    }
-  }
+  //   // 管理员访问管理页面时，初始化应用状态
+  //   if (to.meta.userType === 'admin' && !appStore.isInitialized) {
+  //     try {
+  //       await appStore.initAppState();
+  //     } catch (error) {
+  //       ElMessage.error('初始化应用状态失败: ' + error.message);
+  //     }
+  //   }
+  // }
   
-  // 已登录用户访问登录/注册页时重定向到首页
-  if (authStore.isLoggedIn && 
-      ['Login', 'AdminLogin', 'Register'].includes(to.name)) {
-    ElMessage.info('您已登录，将跳转到首页');
+  // // 已登录用户访问登录/注册页时重定向到首页
+  // if (authStore.isLoggedIn && 
+  //     ['Login', 'AdminLogin', 'Register'].includes(to.name)) {
+  //   ElMessage.info('您已登录，将跳转到首页');
     
-    if (authStore.isAdmin) {
-      return next({ name: 'Dashboard' });
-    } else {
-      return next({ name: 'UserHome' });
-    }
-  }
+  //   if (authStore.isAdmin) {
+  //     return next({ name: 'Dashboard' });
+  //   } else {
+  //     return next({ name: 'UserHome' });
+  //   }
+  // }
   
   next();
 });

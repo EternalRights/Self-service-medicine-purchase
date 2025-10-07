@@ -86,6 +86,20 @@ export default {
     const loading = ref(false)
     
     const handleAdminLogin = async () => {
+      // 硬编码管理员验证
+      if (form.account === 'admin' && form.password === '123456') {
+        const user = {
+          id: 0,
+          username: 'admin',
+          name: '默认管理员',
+          role: 'admin'
+        };
+        localStorage.setItem('user', JSON.stringify(user));
+        ElMessage.success('管理员登录成功');
+        router.push('/admin/dashboard');
+        return;
+      }
+      
       const isValid = await v$.value.$validate()
       if (!isValid) {
         return

@@ -10,12 +10,13 @@
     "postinstall": "vue-demi-switch 3 && node ./fix-vue-demi.js"
   },
   "dependencies": {
-    "vue": "^3.3.4",
-    "vue-demi": "^0.14.6",
-    "pinia": "^2.1.7",
     "@element-plus/icons-vue": "^2.3.1",
     "axios": "^1.7.2",
+    "echarts": "^6.0.0",
     "element-plus": "^2.4.4",
+    "pinia": "^2.1.7",
+    "vue": "^3.3.4",
+    "vue-demi": "^0.14.6",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {

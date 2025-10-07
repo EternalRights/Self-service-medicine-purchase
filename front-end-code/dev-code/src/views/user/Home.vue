@@ -1,151 +1,199 @@
 <template>
-  <div class="home-page">
-    <!-- 排序和筛选区域 -->
-    <div class="filter-bar">
-      <div class="filter-item">
-        <span>排序方式：</span>
-        <el-select v-model="sortOption" placeholder="默认排序">
-          <el-option label="默认排序" value="default" />
-          <el-option label="价格从低到高" value="price_asc" />
-          <el-option label="价格从高到低" value="price_desc" />
-        </el-select>
+  <div class="home-container">
+    <!-- 顶部导航栏
+    <div class="header">
+      <div class="logo-section">
+        <img :src="medicineBoxImg" alt="医药自助购" class="logo">
+        <span class="app-name">医药自助购</span>
+        <el-tag 
+          :style="appStore.businessStatusStyle"
+          class="business-status"
+        >
+          {{ appStore.businessStatusText }}
+        </el-tag>
       </div>
       
-      <div class="filter-item">
-        <span>药品分类：</span>
-        <el-select v-model="categoryOption" placeholder="全部药品">
-          <el-option label="全部药品" value="all" />
-          <el-option label="非处方药(OTC)" value="otc" />
-          <el-option label="处方药(Rx)" value="rx" />
-          <el-option label="医疗器械" value="medical" />
-          <el-option label="保健养生" value="health" />
-        </el-select>
+      <div class="nav-right">
+        <div class="cart-icon" @click="goToCart">
+          <el-badge :value="cartStore.totalItems" class="badge">
+            <el-icon :size="24"><ShoppingCart /></el-icon>
+          </el-badge>
+          <el-tooltip content="查看购物车" placement="bottom">
+            <span class="cart-text">购物车</span>
+          </el-tooltip>
+        </div>
+        
+        <el-dropdown>
+          <span class="user-dropdown">
+            <el-icon :size="20"><User /></el-icon>
+            <span class="user-name">{{ authStore.userName }}</span>
+          </span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="goToProfile">个人中心</el-dropdown-item>
+              <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </div>
-    </div>
+    </div> -->
     
-    <!-- 药品列表 -->
-    <div class="drug-list">
-      <DrugCard 
-        v-for="drug in drugs" 
-        :key="drug.id" 
-        :drug="drug" 
-        :business-status="appStore.businessStatus"
-      />
-    </div>
+    <!-- 搜索区域已移除，根据需求清除快捷标签功能 -->
     
-    <!-- 分页组件 -->
-    <div class="pagination">
-      <el-pagination
-        background
-        layout="prev, pager, next"
-        :total="total"
-        :page-size="pageSize"
-        :current-page="currentPage"
-        @current-change="handlePageChange"
-      />
-    </div>
+    <!-- 药品列表区域 -->
+    <DrugList />
   </div>
 </template>
 
-<script>
-import { ref } from 'vue'
-import DrugCard from '@/components/drug/DrugCard.vue'
-import { useAppStore } from '@/stores/app'
+<script setup>
+// import { ref } from 'vue'
+// import { useRouter } from 'vue-router'
+// import { ShoppingCart, User, Search } from '@element-plus/icons-vue'
+// import { useDrugStore } from '@/stores/drug'
+// import { useAuthStore } from '@/stores/auth'
+// import { useAppStore } from '@/stores/app'
+// import { useCartStore } from '@/stores/cart'
+import DrugList from '@/components/drug/DrugList.vue'
+// import medicineBoxImg from '@/assets/medicine-box.png'
 
-export default {
-  components: {
-    DrugCard
-  },
-  setup() {
-    const appStore = useAppStore()
-    
-    // 模拟药品数据
-    const drugs = ref([
-      {
-        id: 1,
-        name: '阿莫西林胶囊',
-        category: '处方药',
-        specification: '0.25g*24粒',
-        price: 25.8,
-        stock: 10,
-        image: '',
-        isPrescription: true
-      },
-      {
-        id: 2,
-        name: '板蓝根颗粒',
-        category: '非处方药',
-        specification: '10g*20袋',
-        price: 18.5,
-        stock: 25,
-        image: '',
-        isPrescription: false
-      },
-      // 更多药品数据...
-    ])
-    
-    const sortOption = ref('default')
-    const categoryOption = ref('all')
-    const currentPage = ref(1)
-    const pageSize = ref(10)
-    const total = ref(100)
-    
-    const handlePageChange = (page) => {
-      currentPage.value = page
-      // 实际项目中这里会调用API获取新页面的数据
-    }
-    
-    return {
-      drugs,
-      sortOption,
-      categoryOption,
-      currentPage,
-      pageSize,
-      total,
-      appStore,
-      handlePageChange
-    }
-  }
-}
+// const router = useRouter()
+// const drugStore = useDrugStore()
+// const authStore = useAuthStore()
+// const appStore = useAppStore()
+// const cartStore = useCartStore()
+
+// const searchKeyword = ref('')
+// const quickTags = ref([
+//   { id: 1, name: '感冒发烧', keyword: '感冒' },
+//   { id: 2, name: '肠胃不适', keyword: '肠胃' },
+//   { id: 3, name: '皮肤外用', keyword: '皮肤' },
+//   { id: 4, name: '维生素/保健品', keyword: '维生素' }
+// ])
+
+// // 处理搜索
+// const handleSearch = () => {
+//   drugStore.searchDrugs(searchKeyword.value)
+// }
+
+// // 处理标签点击
+// const handleTagClick = (tag) => {
+//   searchKeyword.value = tag.keyword
+//   drugStore.searchDrugs(tag.keyword)
+// }
+
+// // 前往购物车
+// const goToCart = () => {
+//   router.push('/user/cart')
+// }
+
+// // 前往个人中心
+// const goToProfile = () => {
+//   router.push('/user/profile')
+// }
+
+// // 退出登录
+// const logout = () => {
+//   authStore.logout()
+//   router.push('/auth/login')
+// }
 </script>
 
 <style scoped>
-.home-page {
+/* .home-container {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 20px;
+} */
+.home-content {
+  padding: 0;
 }
-
-.filter-bar {
+/* 
+.header {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
   margin-bottom: 20px;
-  padding: 15px;
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
 
-.filter-item {
+.logo-section {
   display: flex;
   align-items: center;
-  margin-right: 20px;
+  gap: 10px;
 }
 
-.filter-item span {
-  margin-right: 10px;
-  font-size: 14px;
-  color: #606266;
+.logo {
+  width: 40px;
+  height: 40px;
 }
 
-.drug-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+.app-name {
+  font-size: 24px;
+  font-weight: bold;
+  color: #165DFF;
+}
+
+.business-status {
+  font-weight: bold;
+  margin-left: 15px;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.cart-icon {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.cart-icon:hover {
+  color: #165DFF;
+}
+
+.cart-text {
+  font-size: 16px;
+}
+
+.user-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.user-name {
+  font-size: 16px;
+}
+
+.search-section {
   margin-bottom: 30px;
 }
 
-.pagination {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
+.search-input {
+  width: 100%;
+  margin-bottom: 15px;
 }
+
+.quick-tags {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tag-item {
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tag-item:hover {
+  background-color: #165DFF;
+  color: white;
+} */
 </style>

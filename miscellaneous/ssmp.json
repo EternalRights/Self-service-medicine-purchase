@@ -1,0 +1,1641 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "医药自主购系统API",
+    "version": "1.0.0",
+    "description": "医药电商平台前后端分离接口文档"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api",
+      "description": "本地开发环境"
+    },
+    {
+      "url": "https://api.medical-buy.com",
+      "description": "生产环境"
+    }
+  ],
+  "tags": [
+    {"name": "认证", "description": "用户登录注册相关接口"},
+    {"name": "管理员", "description": "系统管理员操作接口"},
+    {"name": "药品", "description": "药品管理接口"},
+    {"name": "订单", "description": "订单管理接口"},
+    {"name": "用户", "description": "用户管理接口"},
+    {"name": "购物车", "description": "购物车操作接口"},
+    {"name": "通知", "description": "系统通知接口"},
+    {"name": "应用状态", "description": "系统全局状态接口"}
+  ],
+  "paths": {
+    "/auth/user/login": {
+      "post": {
+        "tags": ["认证"],
+        "summary": "用户登录",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCredentials"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "登录成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/admin/login": {
+      "post": {
+        "tags": ["认证"],
+        "summary": "管理员登录",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminCredentials"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "登录成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/user/register": {
+      "post": {
+        "tags": ["认证"],
+        "summary": "用户注册",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegistration"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "注册成功"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["认证"],
+        "summary": "用户登出",
+        "responses": {
+          "200": {
+            "description": "登出成功"
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": ["认证"],
+        "summary": "刷新访问令牌",
+        "responses": {
+          "200": {
+            "description": "令牌刷新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/user": {
+      "get": {
+        "tags": ["认证"],
+        "summary": "获取当前用户信息",
+        "responses": {
+          "200": {
+            "description": "成功获取用户信息",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/user/password": {
+      "post": {
+        "tags": ["认证"],
+        "summary": "修改用户密码",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "密码修改成功"
+          }
+        }
+      }
+    },
+    "/api/admin/list": {
+      "get": {
+        "tags": ["管理员"],
+        "summary": "获取管理员列表",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {"type": "integer"}
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取管理员列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_Admin"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin": {
+      "post": {
+        "tags": ["管理员"],
+        "summary": "创建新管理员",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "管理员创建成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Admin"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/reset-password": {
+      "put": {
+        "tags": ["管理员"],
+        "summary": "重置管理员密码",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminPasswordReset"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "密码重置成功"
+          }
+        }
+      }
+    },
+    "/api/admin/{id}": {
+      "delete": {
+        "tags": ["管理员"],
+        "summary": "删除管理员",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "管理员删除成功"
+          }
+        }
+      }
+    },
+    "/api/app/business-status": {
+      "get": {
+        "tags": ["应用状态"],
+        "summary": "获取营业状态",
+        "responses": {
+          "200": {
+            "description": "成功获取营业状态",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["应用状态"],
+        "summary": "更新营业状态",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BusinessStatusUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "营业状态更新成功"
+          }
+        }
+      }
+    },
+    "/api/admin/change-password": {
+      "post": {
+        "tags": ["管理员"],
+        "summary": "修改管理员密码",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "密码修改成功"
+          }
+        }
+      }
+    },
+    "/api/admin/dashboard/metrics": {
+      "get": {
+        "tags": ["管理员"],
+        "summary": "获取仪表板核心指标",
+        "responses": {
+          "200": {
+            "description": "成功获取指标数据",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardMetrics"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/dashboard/hot-consultations": {
+      "get": {
+        "tags": ["管理员"],
+        "summary": "获取热门咨询药品TOP3",
+        "responses": {
+          "200": {
+            "description": "成功获取热门药品",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HotConsultationDrug"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/dashboard/sales-trend": {
+      "get": {
+        "tags": ["管理员"],
+        "summary": "获取销售趋势数据",
+        "parameters": [
+          {
+            "name": "period",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["7d", "30d"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取销售趋势",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesTrend"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/dashboard/sales-rank": {
+      "get": {
+        "tags": ["管理员"],
+        "summary": "获取药品销量排行",
+        "responses": {
+          "200": {
+            "description": "成功获取销量排行",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SalesRankItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/dashboard/category-distribution": {
+      "get": {
+        "tags": ["管理员"],
+        "summary": "获取药品分类占比",
+        "responses": {
+          "200": {
+            "description": "成功获取分类占比",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryDistribution"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/drugs": {
+      "get": {
+        "tags": ["药品"],
+        "summary": "获取药品列表",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [1, 2, 3, 4]
+            }
+          },
+          {
+            "name": "shelf_status",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [1, 2]
+            }
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "schema": {"type": "string"}
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["default", "price_asc", "price_desc"]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {"type": "integer"}
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取药品列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_Drug"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["药品"],
+        "summary": "创建药品",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DrugCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "药品创建成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Drug"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/drugs/search": {
+      "get": {
+        "tags": ["药品"],
+        "summary": "搜索药品",
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": true,
+            "schema": {"type": "string"}
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {"type": "integer"}
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功搜索药品",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_Drug"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/drugs/{id}": {
+      "get": {
+        "tags": ["药品"],
+        "summary": "获取药品详情",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取药品详情",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Drug"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["药品"],
+        "summary": "更新药品信息",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DrugUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "药品更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Drug"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["药品"],
+        "summary": "删除药品",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "药品删除成功"
+          }
+        }
+      }
+    },
+    "/drugs/categories": {
+      "get": {
+        "tags": ["药品"],
+        "summary": "获取药品分类",
+        "responses": {
+          "200": {
+            "description": "成功获取分类",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DrugCategory"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/drugs/{id}/status": {
+      "patch": {
+        "tags": ["药品"],
+        "summary": "更新药品状态",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "shelf_status": {
+                    "type": "integer",
+                    "enum": [1, 2]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "状态更新成功"
+          }
+        }
+      }
+    },
+    "/drugs/{drugId}/inventory-records": {
+      "get": {
+        "tags": ["药品"],
+        "summary": "获取药品库存记录",
+        "parameters": [
+          {
+            "name": "drugId",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取库存记录",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InventoryRecord"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/drugs/{drugId}/inventory": {
+      "post": {
+        "tags": ["药品"],
+        "summary": "添加药品库存记录",
+        "parameters": [
+          {
+            "name": "drugId",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventoryRecordCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "库存记录添加成功"
+          }
+        }
+      }
+    },
+    "/api/orders": {
+      "get": {
+        "tags": ["订单"],
+        "summary": "获取订单列表",
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "schema": {"type": "string"}
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [1, 2, 3, 4]
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": {"type": "string", "format": "date"}
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": {"type": "string", "format": "date"}
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {"type": "integer"}
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取订单列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_Order"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{id}": {
+      "get": {
+        "tags": ["订单"],
+        "summary": "获取订单详情",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取订单详情",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/status": {
+      "put": {
+        "tags": ["订单"],
+        "summary": "更新订单状态",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderStatusUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "订单状态更新成功"
+          }
+        }
+      }
+    },
+    "/api/notifications": {
+      "get": {
+        "tags": ["通知"],
+        "summary": "获取实时通知列表",
+        "parameters": [
+          {
+            "name": "is_processed",
+            "in": "query",
+            "schema": {"type": "boolean"}
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {"type": "integer"}
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取通知列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_Notification"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["通知"],
+        "summary": "添加新通知",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "通知添加成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notification"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/{id}/status": {
+      "put": {
+        "tags": ["通知"],
+        "summary": "更新通知处理状态",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "is_processed": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "通知状态更新成功"
+          }
+        }
+      }
+    },
+    "/api/notifications/mark-all-read": {
+      "put": {
+        "tags": ["通知"],
+        "summary": "标记所有通知为已读",
+        "responses": {
+          "200": {
+            "description": "标记成功"
+          }
+        }
+      }
+    },
+    "/api/notifications/unread-count": {
+      "get": {
+        "tags": ["通知"],
+        "summary": "获取未读通知数量",
+        "responses": {
+          "200": {
+            "description": "成功获取未读数量",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "unread_count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/me": {
+      "get": {
+        "tags": ["用户"],
+        "summary": "获取当前登录用户信息",
+        "responses": {
+          "200": {
+            "description": "成功获取用户信息",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/profile": {
+      "put": {
+        "tags": ["用户"],
+        "summary": "更新用户个人信息",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserProfileUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "个人信息更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/password": {
+      "put": {
+        "tags": ["用户"],
+        "summary": "修改用户密码",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "密码修改成功"
+          }
+        }
+      }
+    },
+    "/api/admin/users": {
+      "get": {
+        "tags": ["用户"],
+        "summary": "获取用户列表（管理员专用）",
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "schema": {"type": "string"}
+          },
+          {
+            "name": "gender",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [1, 2, 3]
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": {"type": "string", "format": "date"}
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": {"type": "string", "format": "date"}
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {"type": "integer"}
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功获取用户列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_User"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["用户"],
+        "summary": "创建用户（管理员专用）",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegistration"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "用户创建成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{id}": {
+      "put": {
+        "tags": ["用户"],
+        "summary": "更新用户信息（管理员专用）",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserProfileUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "用户信息更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["用户"],
+        "summary": "删除用户（管理员专用）",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "用户删除成功"
+          }
+        }
+      }
+    },
+    "/cart/items": {
+      "post": {
+        "tags": ["购物车"],
+        "summary": "添加到购物车",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "drugId": {"type": "integer"},
+                  "quantity": {"type": "integer"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "商品添加成功"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {"type": "integer"},
+          "message": {"type": "string"},
+          "data": {},
+          "success": {"type": "boolean"},
+          "timestamp": {"type": "integer"}
+        }
+      },
+      "PaginatedResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {}
+          },
+          "total": {"type": "integer"},
+          "page": {"type": "integer"},
+          "pageSize": {"type": "integer"},
+          "totalPages": {"type": "integer"}
+        }
+      },
+      "PaginatedResponse_Admin": {
+        "allOf": [
+          {"$ref": "#/components/schemas/PaginatedResponse"},
+          {
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Admin"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PaginatedResponse_Drug": {
+        "allOf": [
+          {"$ref": "#/components/schemas/PaginatedResponse"},
+          {
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Drug"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PaginatedResponse_Order": {
+        "allOf": [
+          {"$ref": "#/components/schemas/PaginatedResponse"},
+          {
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PaginatedResponse_Notification": {
+        "allOf": [
+          {"$ref": "#/components/schemas/PaginatedResponse"},
+          {
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Notification"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PaginatedResponse_User": {
+        "allOf": [
+          {"$ref": "#/components/schemas/PaginatedResponse"},
+          {
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "UserCredentials": {
+        "type": "object",
+        "properties": {
+          "phone_number": {"type": "string"},
+          "password": {"type": "string"}
+        }
+      },
+      "AdminCredentials": {
+        "type": "object",
+        "properties": {
+          "login_account": {"type": "string"},
+          "password": {"type": "string"}
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "token": {"type": "string"},
+          "expires_in": {"type": "integer"},
+          "user": {"$ref": "#/components/schemas/User"}
+        }
+      },
+      "UserRegistration": {
+        "type": "object",
+        "properties": {
+          "phone_number": {"type": "string"},
+          "password": {"type": "string"},
+          "name": {"type": "string"}
+        }
+      },
+      "PasswordChange": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {"type": "string"},
+          "newPassword": {"type": "string"}
+        }
+      },
+      "Admin": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "login_account": {"type": "string"},
+          "password": {"type": "string"},
+          "name": {"type": "string"},
+          "create_user": {"type": "integer"},
+          "create_time": {"type": "string", "format": "date-time"},
+          "update_user": {"type": "integer"},
+          "update_time": {"type": "string", "format": "date-time"}
+        }
+      },
+      "AdminCreate": {
+        "type": "object",
+        "properties": {
+          "login_account": {"type": "string"},
+          "password": {"type": "string"},
+          "name": {"type": "string"}
+        }
+      },
+      "AdminPasswordReset": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "new_password": {"type": "string"}
+        }
+      },
+      "BusinessStatusResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["营业中", "暂停营业"]
+          }
+        }
+      },
+      "BusinessStatusUpdate": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["营业中", "暂停营业"]
+          }
+        }
+      },
+      "DashboardMetrics": {
+        "type": "object",
+        "properties": {
+          "todayOrders": {"type": "integer"},
+          "todaySales": {"type": "number"},
+          "pendingConsultations": {"type": "integer"},
+          "lowStockItems": {"type": "integer"}
+        }
+      },
+      "HotConsultationDrug": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "generic_name": {"type": "string"},
+          "consultation_count": {"type": "integer"}
+        }
+      },
+      "SalesTrend": {
+        "type": "object",
+        "properties": {
+          "dates": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "orders": {
+            "type": "array",
+            "items": {"type": "integer"}
+          },
+          "sales": {
+            "type": "array",
+            "items": {"type": "number"}
+          }
+        }
+      },
+      "SalesRankItem": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "value": {"type": "number"}
+        }
+      },
+      "CategoryDistribution": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "value": {"type": "number"}
+        }
+      },
+      "Drug": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "generic_name": {"type": "string"},
+          "image": {"type": "string"},
+          "category": {
+            "type": "integer",
+            "enum": [1, 2, 3, 4]
+          },
+          "specification": {"type": "string"},
+          "manufacturer": {"type": "string"},
+          "composition": {"type": "string"},
+          "indications": {"type": "string"},
+          "usage_dosage": {"type": "string"},
+          "precautions": {"type": "string"},
+          "expiry_date": {"type": "string", "format": "date"},
+          "shelf_status": {
+            "type": "integer",
+            "enum": [1, 2]
+          },
+          "stock_quantity": {"type": "integer"},
+          "batch_number": {"type": "string"},
+          "create_user": {"type": "integer"},
+          "create_time": {"type": "string", "format": "date-time"},
+          "update_user": {"type": "integer"},
+          "update_time": {"type": "string", "format": "date-time"}
+        }
+      },
+      "DrugCreate": {
+        "type": "object",
+        "properties": {
+          "generic_name": {"type": "string"},
+          "image": {"type": "string"},
+          "category": {
+            "type": "integer",
+            "enum": [1, 2, 3, 4]
+          },
+          "specification": {"type": "string"},
+          "manufacturer": {"type": "string"},
+          "composition": {"type": "string"},
+          "indications": {"type": "string"},
+          "usage_dosage": {"type": "string"},
+          "precautions": {"type": "string"},
+          "expiry_date": {"type": "string", "format": "date"},
+          "shelf_status": {
+            "type": "integer",
+            "enum": [1, 2]
+          },
+          "stock_quantity": {"type": "integer"},
+          "batch_number": {"type": "string"},
+          "create_user": {"type": "integer"}
+        }
+      },
+      "DrugUpdate": {
+        "type": "object",
+        "properties": {
+          "generic_name": {"type": "string"},
+          "image": {"type": "string"},
+          "category": {
+            "type": "integer",
+            "enum": [1, 2, 3, 4]
+          },
+          "specification": {"type": "string"},
+          "manufacturer": {"type": "string"},
+          "composition": {"type": "string"},
+          "indications": {"type": "string"},
+          "usage_dosage": {"type": "string"},
+          "precautions": {"type": "string"},
+          "expiry_date": {"type": "string", "format": "date"},
+          "shelf_status": {
+            "type": "integer",
+            "enum": [1, 2]
+          },
+          "stock_quantity": {"type": "integer"},
+          "batch_number": {"type": "string"},
+          "update_user": {"type": "integer"}
+        }
+      },
+      "DrugCategory": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "name": {"type": "string"}
+        }
+      },
+      "InventoryRecord": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "drug_id": {"type": "integer"},
+          "quantity": {"type": "integer"},
+          "batch_number": {"type": "string"},
+          "production_date": {"type": "string", "format": "date"},
+          "expiry_date": {"type": "string", "format": "date"},
+          "create_time": {"type": "string", "format": "date-time"},
+          "create_user": {"type": "integer"},
+          "create_user_name": {"type": "string"}
+        }
+      },
+      "InventoryRecordCreate": {
+        "type": "object",
+        "properties": {
+          "quantity": {"type": "integer"},
+          "batch_number": {"type": "string"},
+          "production_date": {"type": "string", "format": "date"},
+          "expiry_date": {"type": "string", "format": "date"}
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "user_id": {"type": "integer"},
+          "total_amount": {"type": "number"},
+          "order_status": {
+            "type": "integer",
+            "enum": [1, 2, 3, 4]
+          },
+          "create_time": {"type": "string", "format": "date-time"}
+        }
+      },
+      "OrderDetail": {
+        "allOf": [
+          {"$ref": "#/components/schemas/Order"},
+          {
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {"type": "integer"},
+                    "order_id": {"type": "integer"},
+                    "drug_id": {"type": "integer"},
+                    "quantity": {"type": "integer"},
+                    "unit_price": {"type": "number"},
+                    "subtotal_amount": {"type": "number"},
+                    "drug": {"$ref": "#/components/schemas/Drug"}
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "OrderStatusUpdate": {
+        "type": "object",
+        "properties": {
+          "order_id": {"type": "integer"},
+          "new_status": {
+            "type": "integer",
+            "enum": [1, 2, 3, 4]
+          }
+        }
+      },
+      "Notification": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "user_id": {"type": "integer"},
+          "message_type": {
+            "type": "integer",
+            "enum": [1, 2]
+          },
+          "title": {"type": "string"},
+          "content": {"type": "string"},
+          "is_processed": {"type": "boolean"},
+          "create_time": {"type": "string", "format": "date-time"},
+          "processed_time": {"type": "string", "format": "date-time"}
+        }
+      },
+      "NotificationCreate": {
+        "type": "object",
+        "properties": {
+          "user_id": {"type": "integer"},
+          "message_type": {
+            "type": "integer",
+            "enum": [1, 2]
+          },
+          "title": {"type": "string"},
+          "content": {"type": "string"}
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "phone_number": {"type": "string"},
+          "password": {"type": "string"},
+          "name": {"type": "string"},
+          "gender": {
+            "type": "integer",
+            "enum": [1, 2, 3]
+          },
+          "age": {"type": "integer"},
+          "create_time": {"type": "string", "format": "date-time"},
+          "update_time": {"type": "string", "format": "date-time"}
+        }
+      },
+      "UserProfileUpdate": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "gender": {
+            "type": "integer",
+            "enum": [1, 2, 3]
+          },
+          "age": {"type": "integer"}
+        }
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ]
+}

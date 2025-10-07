@@ -1,6 +1,6 @@
 // src/stores/app.js
 import { defineStore } from 'pinia';
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed} from 'vue';
 import { ElMessage } from 'element-plus';
 import { get } from '@/utils/request';
 import { BusinessStatus } from '@/types/app';
@@ -27,6 +27,33 @@ export const useAppStore = defineStore('app', () => {
       : { color: '#909399', backgroundColor: '#f4f4f5' }; // 暂停营业 - 灰色
   });
   
+    // 初始化营业状态方法
+  const initBusinessStatus = async () => {
+    try {
+      // 从后端获取权威状态
+      const response = await get('/app/business-status');
+      businessStatus.value = response.data.status;
+      // 持久化有效状态
+      if (response.data.status) {
+        localStorage.setItem('business_status', response.data.status);
+      }
+      
+      // 设置WebSocket实时同步
+      setupWebSocket();
+      
+      ElMessage.success('营业状态初始化成功');
+    } catch (error) {
+      ElMessage.error('获取营业状态失败: ' + error.message);
+      // 回退到本地存储（仅当网络错误）
+      const savedStatus = localStorage.getItem('business_status');
+      if (savedStatus) businessStatus.value = savedStatus;
+      else businessStatus.value = BusinessStatus.OPEN;
+      
+      // 即使失败也尝试建立WebSocket
+      setTimeout(setupWebSocket, 5000);
+    }
+  };
+
   // 营业状态文本
   const businessStatusText = computed(() => {
     return isOpen.value ? '营业中' : '暂停营业';
@@ -114,17 +141,79 @@ export const useAppStore = defineStore('app', () => {
     });
   };
   
-  // 组件挂载时初始化
-  onMounted(() => {
-    // 从本地存储恢复状态
-    const savedStatus = localStorage.getItem('business_status');
-    if (savedStatus) {
-      businessStatus.value = savedStatus;
-    }
+  // // 组件挂载时初始化
+  // onMounted(() => {
+  //   // 从本地存储恢复状态
+  //   const savedStatus = localStorage.getItem('business_status');
+  //   if (savedStatus) {
+  //     businessStatus.value = savedStatus;
+  //   }
     
-    initAppState();
-  });
+  //   initAppState();
+  // });
+      // 添加初始化方法
+    const init = () => {
+      // 从本地存储恢复状态
+      const savedStatus = localStorage.getItem('business_status');
+      if (savedStatus) {
+        businessStatus.value = savedStatus;
+      }
+      
+      initAppState();
+      
+      // 启动营业状态WebSocket同步
+      setupWebSocket();
+    };
   
+  // WebSocket连接管理
+  let ws = null;
+
+  const setupWebSocket = () => {
+    // 清理现有连接
+    if (ws) {
+      ws.close();
+      ws = null;
+    }
+
+    // 从环境变量获取WebSocket地址
+    const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8080/ws/business-status';
+    
+    // 创建新连接
+    ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => {
+      console.log('营业状态WebSocket已连接');
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'BUSINESS_STATUS_UPDATE') {
+          businessStatus.value = data.status;
+          localStorage.setItem('business_status', data.status);
+          
+          // 添加系统通知
+          addGlobalNotification({
+            title: '营业状态更新',
+            message: `系统营业状态已更新为: ${data.status}`,
+            type: 'info'
+          });
+        }
+      } catch (e) {
+        console.error('解析营业状态消息失败', e);
+      }
+    };
+
+    ws.onclose = () => {
+      console.log('营业状态WebSocket断开，5秒后重连');
+      setTimeout(setupWebSocket, 5000);
+    };
+
+    ws.onerror = (error) => {
+      console.error('营业状态WebSocket错误:', error);
+    };
+  };
+
   return {
     // 状态
     businessStatus,
@@ -144,6 +233,12 @@ export const useAppStore = defineStore('app', () => {
     addGlobalNotification,
     clearNotifications,
     formatTime,
-    formatDate
+    formatDate,
+
+    //其他属性
+    init,
+    initBusinessStatus,
+    // WebSocket管理方法
+    setupWebSocket
   };
 });

@@ -1,18 +1,34 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router'
-import { createPinia } from 'pinia'
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
-import './styles/index.css'
+// src/main.js
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
+import { createPinia } from 'pinia';
+import ElementPlus from 'element-plus';
+import 'element-plus/dist/index.css';
 
-// 创建Vue应用实例
-const app = createApp(App)
+const app = createApp(App);
+const pinia = createPinia(); // 创建 pinia 实例
 
-// 使用插件
-app.use(createPinia())
-app.use(router)
-app.use(ElementPlus)
+app.use(pinia); // 使用 pinia 插件
+app.use(router);
+app.use(ElementPlus);
 
-// 挂载应用
-app.mount('#app')
+// 初始化所有 store
+const stores = [
+  'auth',
+  'app',
+  'drug',
+  'cart',
+  'notification'
+];
+
+// 确保在 pinia 安装后初始化 store
+app.mount('#app');
+
+// 在应用挂载后初始化 store
+stores.forEach(storeName => {
+  const store = pinia.state.value[storeName];
+  if (store && typeof store.init === 'function') {
+    store.init();
+  }
+});

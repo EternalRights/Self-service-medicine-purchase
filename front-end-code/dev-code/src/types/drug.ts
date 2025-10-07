@@ -1,3 +1,4 @@
+// src/types/drug.ts
 /**
  * 药品相关类型定义
  * 与数据库drug表结构对齐
@@ -59,4 +60,29 @@ export interface DrugFilterParams {
   shelf_status?: ShelfStatus;
   keyword?: string;
   sort?: 'default' | 'price_asc' | 'price_desc';
+}
+
+/**
+ * 库存记录
+ */
+export interface InventoryRecord {
+  id: number;
+  drug_id: number;
+  quantity: number;
+  batch_number: string;
+  production_date: string; // YYYY-MM-DD
+  expiry_date: string;     // YYYY-MM-DD
+  create_time: string;
+  create_user: number;
+  create_user_name: string;
+}
+
+/**
+ * 库存记录创建信息
+ */
+export interface InventoryRecordCreate {
+  quantity: number;
+  batch_number: string;
+  production_date: string;
+  expiry_date: string;
 }

@@ -18,6 +18,11 @@ export const useAuthStore = defineStore('auth', () => {
   const userName = ref(localStorage.getItem('medical_user_name') || null);
   const userType = ref(localStorage.getItem('medical_user_type') || null); // 'user' 或 'admin'
   
+  // 用户详细信息字段
+  const userGender = ref(localStorage.getItem('medical_user_gender') || null);
+  const userAge = ref(localStorage.getItem('medical_user_age') || null);
+  const userPhone = ref(localStorage.getItem('medical_user_phone') || null);
+  
   // 计算属性
   const isLoggedIn = computed(() => {
     return !!token.value && tokenExpiry.value > Date.now();
@@ -39,6 +44,11 @@ export const useAuthStore = defineStore('auth', () => {
     userName.value = loginData.name || '普通用户';
     userType.value = 'user';
     tokenExpiry.value = Date.now() + 3600 * 1000; // 1小时后过期
+    
+    // 设置用户详细信息（模拟）
+    userGender.value = loginData.gender || null;
+    userAge.value = loginData.age || null;
+    userPhone.value = loginData.phone || null;
     
     // 持久化存储
     persistAuthState();
@@ -85,6 +95,9 @@ export const useAuthStore = defineStore('auth', () => {
     userName.value = null;
     userType.value = null;
     tokenExpiry.value = 0;
+    userGender.value = null;
+    userAge.value = null;
+    userPhone.value = null;
     
     // 清除持久化存储
     clearAuthState();
@@ -101,6 +114,18 @@ export const useAuthStore = defineStore('auth', () => {
     return token.value && tokenExpiry.value > Date.now();
   };
   
+  // 更新用户信息
+  const updateUserProfile = (profileData) => {
+    if (profileData.name) userName.value = profileData.name;
+    if (profileData.gender) userGender.value = profileData.gender;
+    if (profileData.age) userAge.value = profileData.age;
+    
+    // 持久化存储
+    persistAuthState();
+    
+    ElMessage.success('个人信息更新成功');
+  };
+  
   // 持久化认证状态
   const persistAuthState = () => {
     localStorage.setItem('medical_token', token.value);
@@ -108,6 +133,11 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('medical_user_name', userName.value);
     localStorage.setItem('medical_user_type', userType.value);
     localStorage.setItem('medical_token_expiry', tokenExpiry.value.toString());
+    
+    // 用户详细信息持久化
+    localStorage.setItem('medical_user_gender', userGender.value);
+    localStorage.setItem('medical_user_age', userAge.value);
+    localStorage.setItem('medical_user_phone', userPhone.value);
   };
   
   // 清除认证状态
@@ -117,6 +147,11 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('medical_user_name');
     localStorage.removeItem('medical_user_type');
     localStorage.removeItem('medical_token_expiry');
+    
+    // 用户详细信息清除
+    localStorage.removeItem('medical_user_gender');
+    localStorage.removeItem('medical_user_age');
+    localStorage.removeItem('medical_user_phone');
   };
   
   // 初始化时检查token有效性
@@ -125,20 +160,29 @@ export const useAuthStore = defineStore('auth', () => {
   }
   
   return {
+    // 状态
     token,
     tokenExpiry,
     userId,
     userName,
     userType,
+    userGender,
+    userAge,
+    userPhone,
+    
+    // 计算属性
     isLoggedIn,
     isAdmin,
     isUser,
+    
+    // 方法
     userLogin,
     adminLogin,
     userRegister,
     logout,
     checkTokenValidity,
     persistAuthState,
-    clearAuthState
+    clearAuthState,
+    updateUserProfile
   };
 });
