@@ -1,0 +1,54 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+
+  main:
+    #设置为true，允许Bean之间的循环引用。这是解决特定依赖问题的权宜之计，可能暗示项目结构有待优化。
+    allow-circular-references: true
+
+  datasource:
+    driver-class-name: ${ssmp.datasource.driver-class-name}
+    url: jdbc:mysql://${ssmp.datasource.host}:${ssmp.datasource.port}/${ssmp.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${ssmp.datasource.username}
+    password: ${ssmp.datasource.password}
+    type: com.alibaba.druid.pool.DruidDataSource
+
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+
+mybatis:
+  #mapper配置文件
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.eternalrights.pojo
+  configuration:
+    #开启驼峰命名
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com:
+      eternalrights:
+        mapper: debug
+        service: info
+        controller: info
+ssmp:
+  jwt:
+    # 设置jwt签名加密时使用的秘钥
+    admin-secret-key: EternalRigths
+    # 设置jwt过期时间   1天
+    admin-ttl: 86400000
+    # 设置前端传递过来的令牌名称
+    admin-token-name: token
+
+  oss:
+    endpoint: ${ssmp.oss.endpoint}
+    access-key-id: ${ssmp.oss.access-key-id}
+    access-key-secret: ${ssmp.oss.access-key-secret}
+    bucket-name: ${ssmp.oss.bucket-name}
+

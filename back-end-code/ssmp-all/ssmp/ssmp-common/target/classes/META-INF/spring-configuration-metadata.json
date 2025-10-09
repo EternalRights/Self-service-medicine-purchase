@@ -1,0 +1,52 @@
+{
+  "groups": [
+    {
+      "name": "aliyun.oss",
+      "type": "com.eternalrights.properties.AliOssProperties",
+      "sourceType": "com.eternalrights.properties.AliOssProperties"
+    },
+    {
+      "name": "ssmp.jwt",
+      "type": "com.eternalrights.properties.JwtProperties",
+      "sourceType": "com.eternalrights.properties.JwtProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "aliyun.oss.access-key-id",
+      "type": "java.lang.String",
+      "sourceType": "com.eternalrights.properties.AliOssProperties"
+    },
+    {
+      "name": "aliyun.oss.access-key-secret",
+      "type": "java.lang.String",
+      "sourceType": "com.eternalrights.properties.AliOssProperties"
+    },
+    {
+      "name": "aliyun.oss.bucket-name",
+      "type": "java.lang.String",
+      "sourceType": "com.eternalrights.properties.AliOssProperties"
+    },
+    {
+      "name": "aliyun.oss.endpoint",
+      "type": "java.lang.String",
+      "sourceType": "com.eternalrights.properties.AliOssProperties"
+    },
+    {
+      "name": "ssmp.jwt.user-secret-key",
+      "type": "java.lang.String",
+      "sourceType": "com.eternalrights.properties.JwtProperties"
+    },
+    {
+      "name": "ssmp.jwt.user-token-name",
+      "type": "java.lang.String",
+      "sourceType": "com.eternalrights.properties.JwtProperties"
+    },
+    {
+      "name": "ssmp.jwt.user-ttl",
+      "type": "java.lang.Long",
+      "sourceType": "com.eternalrights.properties.JwtProperties"
+    }
+  ],
+  "hints": []
+}

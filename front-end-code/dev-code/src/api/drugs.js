@@ -85,7 +85,7 @@ export const updateDrugStatus = (id, data) => {
 /**
  * 获取药品库存记录
  * @param {number} drugId - 药品ID
- * @returns {Promise<import('@/types/api').ApiResponse<Array<import('@/types/drug').InventoryRecord>>>}
+ * @returns {Promise<import('@/types/drug').InventoryRecord>}
  */
 export const getDrugInventoryRecords = (drugId) => {
   return request.get(`/drugs/${drugId}/inventory-records`)

@@ -111,7 +111,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick,watch} from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import {
+  getDashboardMetrics,
+  getHotConsultations,
+  getSalesTrend,
+  getSalesRank,
+  getCategoryDistribution
+} from '@/api/admins'
 import * as echarts from 'echarts'
 import { 
   ShoppingCart, 
@@ -133,6 +140,12 @@ let salesRankChart = null
 let categoryChart = null
 
 // 响应式数据
+const salesRank = ref([])
+const categoryDistribution = ref([])
+const salesTrendData = ref({
+  '7d': { dates: [], orders: [], sales: [] },
+  '30d': { dates: [], orders: [], sales: [] }
+})
 const metrics = ref({
   todayOrders: 0,
   todaySales: 0,
@@ -144,44 +157,7 @@ const hotConsultationDrugs = ref([])
 const salesTrendPeriod = ref('7d')
 
 // 模拟数据（实际项目中应从API获取）
-const mockData = {
-  metrics: {
-    todayOrders: 42,
-    todaySales: 8560.50,
-    pendingConsultations: 3,
-    lowStockItems: 5
-  },
-  hotConsultationDrugs: [
-    { id: 1, generic_name: '阿莫西林胶囊', consultation_count: 12 },
-    { id: 2, generic_name: '连花清瘟胶囊', consultation_count: 8 },
-    { id: 3, generic_name: '血压计', consultation_count: 5 }
-  ],
-  salesTrend: {
-    '7d': {
-      dates: ['10-01', '10-02', '10-03', '10-04', '10-05', '10-06', '10-07'],
-      orders: [35, 42, 38, 45, 52, 48, 42],
-      sales: [6200, 7500, 6800, 8200, 9100, 8600, 7560]
-    },
-    '30d': {
-      dates: Array.from({ length: 30 }, (_, i) => `09-${i + 7}`),
-      orders: Array.from({ length: 30 }, () => Math.floor(Math.random() * 60) + 20),
-      sales: Array.from({ length: 30 }, () => Math.floor(Math.random() * 12000) + 5000)
-    }
-  },
-  salesRank: [
-    { name: '维生素C片', value: 156 },
-    { name: '创可贴', value: 142 },
-    { name: '口罩', value: 128 },
-    { name: '感冒灵颗粒', value: 115 },
-    { name: '碘伏消毒液', value: 98 }
-  ],
-  categoryDistribution: [
-    { name: '非处方药(OTC)', value: 45 },
-    { name: '保健养生', value: 25 },
-    { name: '医疗器械', value: 20 },
-    { name: '处方药(Rx)', value: 10 }
-  ]
-}
+
 
 // 初始化图表
 const initCharts = () => {
@@ -341,21 +317,47 @@ const initCharts = () => {
 // 更新销售趋势图
 const updateSalesChart = () => {
   if (salesChart) {
-    const option = salesChart.getOption()
-    option.xAxis[0].data = mockData.salesTrend[salesTrendPeriod.value].dates
-    option.series[0].data = mockData.salesTrend[salesTrendPeriod.value].orders
-    option.series[1].data = mockData.salesTrend[salesTrendPeriod.value].sales
-    salesChart.setOption(option)
+    const option = salesChart.getOption();
+    const currentData = salesTrendData.value[salesTrendPeriod.value];
+    option.xAxis[0].data = currentData.dates;
+    option.series[0].data = currentData.orders;
+    option.series[1].data = currentData.sales;
+    salesChart.setOption(option);
   }
 }
 
 // 加载数据
 const loadData = async () => {
-  // 模拟API调用延迟
-  await new Promise(resolve => setTimeout(resolve, 500))
-  
-  metrics.value = mockData.metrics
-  hotConsultationDrugs.value = mockData.hotConsultationDrugs
+  try {
+    loading.value = true;
+    // 获取核心指标
+    const metricsResponse = await getDashboardMetrics();
+    metrics.value = metricsResponse.data;
+
+    // 获取热门咨询药品
+    const hotDrugsResponse = await getHotConsultations();
+    hotConsultationDrugs.value = hotDrugsResponse.data;
+
+    // 获取销售趋势
+    const salesTrendResponse = await getSalesTrend(salesTrendPeriod.value);
+    salesTrendData.value[salesTrendPeriod.value] = salesTrendResponse.data;
+
+    // 获取药品销量排行
+    const salesRankResponse = await getSalesRank();
+    salesRank.value = salesRankResponse.data;
+
+    // 获取药品分类占比
+    const categoryDistributionResponse = await getCategoryDistribution();
+    categoryDistribution.value = categoryDistributionResponse.data;
+
+    // 初始化图表
+    await nextTick();
+    initCharts();
+  } catch (error) {
+    ElMessage.error('加载数据失败: ' + error.message);
+  } finally {
+    loading.value = false;
+  }
 }
 
 // 响应式监听

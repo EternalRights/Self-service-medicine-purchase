@@ -63,16 +63,13 @@ export const useAuth = () => {
         isAuthenticated.value = true;
         isUser.value = true;
         
-        ElMessage.success('登录成功');
+        // 消息提示由 store 统一处理
         router.push('/user/home');
       } else {
-        errorMessage.value = response.message || '登录失败，请检查账号密码';
-        ElMessage.error(errorMessage.value);
+        // 消息提示由 store 统一处理
       }
     } catch (error) {
-      console.error('登录失败:', error);
-      errorMessage.value = '登录失败，请稍后重试';
-      ElMessage.error(errorMessage.value);
+      // 消息提示由 store 统一处理
     } finally {
       isLoading.value = false;
     }
@@ -100,16 +97,13 @@ export const useAuth = () => {
         isAuthenticated.value = true;
         isAdmin.value = true;
         
-        ElMessage.success('管理员登录成功');
+        // 消息提示由 store 统一处理
         router.push('/admin/dashboard');
       } else {
-        errorMessage.value = response.message || '登录失败，请检查账号密码';
-        ElMessage.error(errorMessage.value);
+        // 消息提示由 store 统一处理
       }
     } catch (error) {
-      console.error('管理员登录失败:', error);
-      errorMessage.value = '登录失败，请稍后重试';
-      ElMessage.error(errorMessage.value);
+      // 消息提示由 store 统一处理
     } finally {
       isLoading.value = false;
     }
@@ -126,16 +120,13 @@ export const useAuth = () => {
       const response = await authApi.userRegister(registerForm.value);
       
       if (response.success) {
-        ElMessage.success('注册成功，请登录');
+        // 消息提示由 store 统一处理
         router.push('/auth/login');
       } else {
-        errorMessage.value = response.message || '注册失败，请稍后重试';
-        ElMessage.error(errorMessage.value);
+        // 消息提示由 store 统一处理
       }
     } catch (error) {
-      console.error('注册失败:', error);
-      errorMessage.value = '注册失败，请稍后重试';
-      ElMessage.error(errorMessage.value);
+      // 消息提示由 store 统一处理
     } finally {
       isLoading.value = false;
     }
@@ -153,11 +144,10 @@ export const useAuth = () => {
       isAdmin.value = false;
       isUser.value = false;
       
-      ElMessage.success('已成功登出');
+      // 消息提示由 store 统一处理
       router.push('/auth/login');
     } catch (error) {
-      console.error('登出失败:', error);
-      ElMessage.error('登出失败，请重试');
+      // 消息提示由 store 统一处理
     }
   };
   

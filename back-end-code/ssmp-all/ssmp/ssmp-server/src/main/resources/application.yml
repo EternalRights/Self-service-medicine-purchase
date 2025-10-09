@@ -1,0 +1,46 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+  datasource:
+    druid:
+      driver-class-name: ${ssmp.datasource.driver-class-name}
+      url: jdbc:mysql://${ssmp.datasource.host}:${ssmp.datasource.port}/${ssmp.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${ssmp.datasource.username}
+      password: ${ssmp.datasource.password}
+
+mybatis:
+  #mapper配置文件
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.eternalrights.entity
+  configuration:
+    #开启驼峰命名
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com:
+      eternalrights:
+        mapper: debug
+        service: info
+        controller: info
+
+ssmp:
+  jwt:
+    # 设置jwt签名加密时使用的秘钥
+    user-secret-key: EternalRights
+    # 设置jwt过期时间
+    user-ttl: 720000000
+    # 设置前端传递过来的令牌名称
+    user-token-name: token
+
+aliyun:
+  oss:
+    endpoint: ${ssmp.oss.endpoint}
+    access-key-id: ${ssmp.oss.access-key-id}
+    access-key-secret: ${ssmp.oss.access-key-secret}
+    bucket-name: ${ssmp.oss.bucket-name}

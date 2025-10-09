@@ -1,0 +1,5 @@
+com\eternalrights\vo\AuthResult$AuthResultBuilder.class
+com\eternalrights\vo\AuthResult.class
+com\eternalrights\dto\LoginRequest.class
+com\eternalrights\vo\LoginResponse.class
+com\eternalrights\entity\User.class

@@ -251,7 +251,6 @@ const handleLogout = async () => {
     })
     await authStore.logout()
     router.push('/auth/admin-login')
-    ElMessage.success('退出登录成功')
   } catch (error) {
     // 用户取消退出
   }
@@ -263,7 +262,7 @@ onMounted(async () => {
     await appStore.initBusinessStatus()
   } catch (error) {
     console.error('初始化营业状态失败:', error)
-    ElMessage.error('初始化营业状态失败')
+    // 消息提示由 store 统一处理
   }
 })
 </script>

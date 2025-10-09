@@ -102,10 +102,8 @@ export default {
           username: form.username,
           password: form.password
         })
-        ElMessage.success('登录成功')
-        router.push('/user/home')
       } catch (error) {
-        ElMessage.error('登录失败: ' + (error.message || '用户名或密码错误'))
+        // 消息提示由 store 统一处理
       } finally {
         loading.value = false
       }
@@ -114,11 +112,11 @@ export default {
     const goToRegister = () => {
       router.push('/auth/register')
     }
-    
+
     const goToAdminLogin = () => {
       router.push('/auth/admin-login')
     }
-    
+
     return {
       form,
       v$,

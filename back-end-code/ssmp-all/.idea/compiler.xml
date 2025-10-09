@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="ssmp-common" />
+        <module name="ssmp-server" />
+        <module name="ssmp-pojo" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel target="21">
+      <module name="pojo" target="21" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="pojo" options="-parameters" />
+      <module name="ssmp" options="" />
+      <module name="ssmp-common" options="-parameters" />
+      <module name="ssmp-pojo" options="-parameters" />
+      <module name="ssmp-server" options="-parameters" />
+    </option>
+  </component>
+</project>

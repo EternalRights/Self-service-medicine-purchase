@@ -350,7 +350,8 @@ import {
   updateDrug,
   updateDrugStatus,
   getDrugInventoryRecords
-} from '@/api/drugs'
+} from '@/api/drugs';
+import { uploadFile } from '@/api/upload';
 import { ShelfStatus, DrugCategory } from '@/types/drug'
 import { ElMessage, ElMessageBox } from 'element-plus'
 const medicineBoxIcon = new URL('@/assets/medicine-box.png', import.meta.url).href
@@ -429,9 +430,16 @@ const fetchDrugList = async () => {
       shelf_status: filterShelfStatus.value
     }
     
-    const response = await getDrugList(params)
-    drugList.value = response.data.items
-    pagination.total = response.data.total
+    // 由于request.js已统一处理Result包装，可直接获取解包后的业务数据
+    try {
+      const pageResult = await getDrugList(params)
+      drugList.value = pageResult.items || []
+      pagination.total = pageResult.total || 0
+    } catch (error) {
+      ElMessage.error('获取药品列表失败: ' + error.message)
+      drugList.value = []
+      pagination.total = 0
+    }
   } catch (error) {
     ElMessage.error('获取药品列表失败: ' + error.message)
   } finally {
@@ -494,10 +502,9 @@ const submitDrugForm = async () => {
         }
       })
       
-      // 添加图片文件（如果存在）
-      if (drugForm.value.imageFile) {
-        formData.append('image', drugForm.value.imageFile)
-      }
+      // image字段已是OSS返回的URL，无需再次上传文件
+      // OSS方案下，图片已在handleImageUpload阶段上传并获得URL
+      // 此处直接使用drugForm.value.image中的URL即可
       
       await updateDrug(drugForm.value.id, formData)
       ElMessage.success('药品信息更新成功')
@@ -510,10 +517,9 @@ const submitDrugForm = async () => {
         }
       })
       
-      // 添加图片文件（如果存在）
-      if (drugForm.value.imageFile) {
-        formData.append('image', drugForm.value.imageFile)
-      }
+      // image字段已是OSS返回的URL，无需再次上传文件
+      // OSS方案下，图片已在handleImageUpload阶段上传并获得URL
+      // 此处直接使用drugForm.value.image中的URL即可
       
       await createDrug(formData)
       ElMessage.success('药品创建成功')
@@ -551,8 +557,9 @@ const viewDrugDetails = async (drug) => {
   activeDetailTab.value = 'basic'
   
   try {
-    const response = await getDrugInventoryRecords(drug.id)
-    inventoryRecords.value = response.data
+    // 由于request.js已统一处理Result包装，可直接获取解包后的业务数据
+    const record = await getDrugInventoryRecords(drug.id)
+    inventoryRecords.value = [record] // 后端返回单个InventoryRecord对象，但表格需要数组
   } catch (error) {
     ElMessage.error('获取库存记录失败: ' + error.message)
     inventoryRecords.value = []
@@ -581,17 +588,34 @@ const beforeImageUpload = (file) => {
 
 const handleImageUpload = async ({ file }) => {
   try {
-    // 保存文件对象而非base64
-    drugForm.value.imageFile = file
+    // 保存文件对象用于后续上传
+    drugForm.value.imageFile = file;
     
     // 显示预览
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onload = (e) => {
-      drugForm.value.imagePreview = e.target.result
-    }
-    reader.readAsDataURL(file)
+      drugForm.value.imagePreview = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    
+    // 创建FormData上传到OSS
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    // 调用独立上传接口
+    const response = await uploadFile(formData);
+    
+    // 将OSS返回的URL赋值给image字段
+    drugForm.value.image = response.data;
+    
+    // 清除临时文件对象（已通过URL引用）
+    drugForm.value.imageFile = null;
+    
+    ElMessage.success('图片上传成功');
   } catch (error) {
-    ElMessage.error('图片上传失败: ' + error.message)
+    ElMessage.error('图片上传失败: ' + error.message);
+    // 上传失败时保留原始文件对象以便重试
+    drugForm.value.imageFile = file;
   }
 }
 

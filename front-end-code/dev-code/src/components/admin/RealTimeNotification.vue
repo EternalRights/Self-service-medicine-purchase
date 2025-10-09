@@ -125,15 +125,7 @@ const playSound = (priority) => {
 // 监听新通知
 onMounted(() => {
   // 实际项目中这里应该使用WebSocket或轮询获取新通知
-  // 这里仅模拟新通知到达时的效果
-  setTimeout(() => {
-    notificationStore.addNotification({
-      message_type: MessageType.MEDICAL_CONSULT,
-      title: '用药咨询-待处理',
-      content: '用户张三于17:02咨询处方药阿莫西林胶囊，请及时处理！'
-    })
-    playSound('high')
-  }, 3000)
+  // 模拟代码已移除，由后端实时推送
 })
 
 </script>

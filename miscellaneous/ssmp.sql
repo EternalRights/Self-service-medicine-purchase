@@ -42,7 +42,7 @@ CREATE TABLE drug (
     usage_dosage TEXT DEFAULT NULL COMMENT '用法用量',
     precautions TEXT DEFAULT NULL COMMENT '注意事项',
     expiry_date DATE DEFAULT NULL COMMENT '有效期',
-    shelf_status INT DEFAULT 1 COMMENT '上架状态：1-上架，2-下架',
+    shelf_status INT DEFAULT 1 COMMENT '上架状态：1-上架，2-下架'
     stock_quantity INT DEFAULT 0 COMMENT '库存数量',
     batch_number VARCHAR(100) DEFAULT NULL COMMENT '生产批号',
     create_user INT NOT NULL COMMENT '创建用户ID',
@@ -92,7 +92,7 @@ CREATE TABLE order_item (
 CREATE TABLE notification (
     id INT PRIMARY KEY AUTO_INCREMENT COMMENT '消息ID',
     user_id INT NOT NULL COMMENT '用户ID',
-    message_type INT NOT NULL COMMENT '消息类型：1-用药咨询，2-订单生成',
+    message_type INT NOT NULL COMMENT '消息类型：1-用药咨询，2-订单生成'
     title VARCHAR(200) NOT NULL COMMENT '消息标题',
     content TEXT NOT NULL COMMENT '消息内容',
     is_processed TINYINT(1) DEFAULT 0 COMMENT '是否已处理：0-未处理，1-已处理',

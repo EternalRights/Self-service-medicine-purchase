@@ -10,7 +10,7 @@ import { useAuthStore } from '@/stores/auth'
 // 创建 axios 实例
 const service = axios.create({
   // 基础地址 - 根据环境变量配置
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
   
   // 请求超时时间（毫秒）
   timeout: 30000,
@@ -122,38 +122,34 @@ service.interceptors.response.use(
     }
     
     // 根据后端统一响应格式处理
-    // 假设标准响应格式: { code: number, message: string, data: any, success: boolean }
+    // 当前项目使用 Result<T> 包装结构: { code: number, msg: string, data: T }
     if (data && typeof data === 'object') {
-      const { code, message, success } = data
+      const { code, msg } = data
       
-      // 业务成功
-      if (success || code === 200) {
-        return data.data || data
+      // 业务成功（code为1表示成功）
+      if (code === 1) {
+        return data.data // 直接返回解包后的业务数据
       }
       
       // 业务错误处理
-      if (code === 401) {
-        // Token 过期或无效
-        const authStore = useAuthStore()
-        authStore.logout()
-        ElMessage.error('登录已过期，请重新登录')
-        // 跳转到登录页
-        window.location.href = '/auth/login'
-        return Promise.reject(new Error('登录状态已过期'))
+      if (code === 0) { // 后端定义 code=0 表示失败
+        const errorMsg = msg || '操作失败'
+        ElMessage.error(errorMsg)
+        
+        // 特殊错误码处理
+        if ([401, 403].includes(code)) {
+          const authStore = useAuthStore()
+          authStore.logout()
+          setTimeout(() => {
+            window.location.href = '/auth/login'
+          }, 1500)
+        }
+        
+        return Promise.reject(new Error(errorMsg))
       }
-      
-      if (code === 403) {
-        ElMessage.error('权限不足，无法访问该资源')
-        return Promise.reject(new Error('权限不足'))
-      }
-      
-      // 其他业务错误
-      const errorMsg = message || '操作失败'
-      ElMessage.error(errorMsg)
-      return Promise.reject(new Error(errorMsg))
     }
     
-    // 如果没有标准格式，直接返回数据
+    // 对于非 Result<T> 包装的直接响应（如二进制流已提前处理），直接返回
     return data
   },
   (error) => {

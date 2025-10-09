@@ -133,8 +133,6 @@ export default {
           name: form.name,
           password: form.password
         })
-        ElMessage.success('注册成功，请登录')
-        router.push('/auth/login')
       } catch (error) {
         ElMessage.error('注册失败: ' + (error.message || '请稍后再试'))
       } finally {

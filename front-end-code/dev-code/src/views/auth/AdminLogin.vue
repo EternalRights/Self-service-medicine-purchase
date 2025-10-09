@@ -45,6 +45,10 @@
             登录
           </el-button>
         </el-form-item>
+        
+        <div class="login-footer">
+          <el-link type="primary" @click="goToUserLogin">返回用户登录</el-link>
+        </div>
       </el-form>
     </div>
   </div>
@@ -86,19 +90,8 @@ export default {
     const loading = ref(false)
     
     const handleAdminLogin = async () => {
-      // 硬编码管理员验证
-      if (form.account === 'admin' && form.password === '123456') {
-        const user = {
-          id: 0,
-          username: 'admin',
-          name: '默认管理员',
-          role: 'admin'
-        };
-        localStorage.setItem('user', JSON.stringify(user));
-        ElMessage.success('管理员登录成功');
-        router.push('/admin/dashboard');
-        return;
-      }
+      // 将所有管理员登录请求统一交给store处理
+      // 包括默认管理员账号 admin/123456
       
       const isValid = await v$.value.$validate()
       if (!isValid) {
@@ -111,20 +104,23 @@ export default {
           account: form.account,
           password: form.password
         })
-        ElMessage.success('管理员登录成功')
-        router.push('/admin/dashboard')
       } catch (error) {
-        ElMessage.error('登录失败: ' + (error.message || '账号或密码错误'))
+        // 消息提示由 store 统一处理
       } finally {
         loading.value = false
       }
     }
     
+    const goToUserLogin = () => {
+      router.push('/auth/login')
+    }
+
     return {
       form,
       v$,
       loading,
-      handleAdminLogin
+      handleAdminLogin,
+      goToUserLogin
     }
   }
 }

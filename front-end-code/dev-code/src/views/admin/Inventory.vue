@@ -281,9 +281,16 @@ const fetchInventoryList = async () => {
       params.low_stock = filterStockStatus.value
     }
     
-    const response = await getDrugList(params)
-    inventoryList.value = response.data.items
-    pagination.total = response.data.total
+    // 由于request.js已统一处理Result包装，可直接获取解包后的业务数据
+    try {
+      const pageResult = await getDrugList(params)
+      inventoryList.value = pageResult.items || []
+      pagination.total = pageResult.total || 0
+    } catch (error) {
+      ElMessage.error('获取库存列表失败: ' + error.message)
+      inventoryList.value = []
+      pagination.total = 0
+    }
   } catch (error) {
     ElMessage.error('获取库存列表失败: ' + error.message)
   } finally {
@@ -346,9 +353,14 @@ const submitInventory = async () => {
 const viewInventoryRecords = async (drug) => {
   currentDrug.value = drug
   try {
-    const response = await getDrugInventoryRecords(drug.id)
-    inventoryRecords.value = response.data
-    inventoryRecordsDialogVisible.value = true
+    // 由于request.js已统一处理Result包装，可直接获取解包后的业务数据
+    try {
+      const record = await getDrugInventoryRecords(drug.id)
+      inventoryRecords.value = [record] // 后端返回单个对象，但表格需要数组
+      inventoryRecordsDialogVisible.value = true
+    } catch (error) {
+      ElMessage.error('获取库存记录失败: ' + error.message)
+    }
   } catch (error) {
     ElMessage.error('获取库存记录失败: ' + error.message)
   }
@@ -360,7 +372,7 @@ const getCategoryTagType = (category) => {
     case DrugCategory.OTC: return 'success'
     case DrugCategory.RX: return 'warning'
     case DrugCategory.MEDICAL: return 'info'
-    case DrugCategory.HEALTH: return ''
+    case DrugCategory.HEALTH: return 'info'
     default: return 'info'
   }
 }

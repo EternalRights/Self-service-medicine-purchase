@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
+import * as userApi from '@/api/auth';
 
 /**
  * 认证状态管理
@@ -37,55 +38,113 @@ export const useAuthStore = defineStore('auth', () => {
   });
   
   // 用户登录
-  const userLogin = (loginData) => {
-    // 实际项目中这里会调用API，这里模拟登录成功
-    token.value = 'user_token_' + Date.now();
-    userId.value = loginData.userId || 'user_' + Math.floor(Math.random() * 1000);
-    userName.value = loginData.name || '普通用户';
-    userType.value = 'user';
-    tokenExpiry.value = Date.now() + 3600 * 1000; // 1小时后过期
+  const userLogin = async (loginData) => {
+    // 参数校验
+    if (!loginData.username || !loginData.password) {
+      ElMessage.error('请输入用户名和密码');
+      throw new Error('缺少登录凭证');
+    }
     
-    // 设置用户详细信息（模拟）
-    userGender.value = loginData.gender || null;
-    userAge.value = loginData.age || null;
-    userPhone.value = loginData.phone || null;
-    
-    // 持久化存储
-    persistAuthState();
-    
-    // 登录成功提示
-    ElMessage.success('登录成功');
-    
-    // 跳转到用户首页
-    router.push('/user/home');
+    try {
+      // 调用真实API
+      const response = await userApi.userLogin({
+        phone_number: loginData.username,
+        password: loginData.password
+      });
+      
+      // 假设API返回格式：{ token, user: { id, name, gender, age, phone } }
+      const { token: apiToken, user } = response.data;
+      
+      token.value = apiToken;
+      userId.value = user.id;
+      userName.value = user.name;
+      userType.value = 'user';
+      tokenExpiry.value = Date.now() + 3600 * 1000; // 可从token解析过期时间
+      
+      // 设置用户详细信息
+      userGender.value = user.gender || null;
+      userAge.value = user.age || null;
+      userPhone.value = user.phone || null;
+      
+      // 持久化存储
+      persistAuthState();
+      
+      // 跳转到用户首页
+      router.push('/user/home');
+    } catch (error) {
+      ElMessage.error('登录失败: ' + (error.message || '用户名或密码错误'));
+      throw error;
+    }
   };
   
   // 管理员登录
-  const adminLogin = (loginData) => {
-    // 实际项目中这里会调用API，这里模拟登录成功
-    token.value = 'admin_token_' + Date.now();
-    userId.value = loginData.userId || 'admin_' + Math.floor(Math.random() * 1000);
-    userName.value = loginData.name || '管理员';
-    userType.value = 'admin';
-    tokenExpiry.value = Date.now() + 3600 * 1000; // 1小时后过期
+  const adminLogin = async (loginData) => {
+    // 参数校验
+    if (!loginData.account || !loginData.password) {
+      ElMessage.error('请输入账号和密码');
+      throw new Error('缺少登录凭证');
+    }
     
-    // 持久化存储
-    persistAuthState();
+    // 【特殊处理】默认管理员账号（前端挂载）
+    if (loginData.account === 'admin' && loginData.password === '123456') {
+      token.value = 'admin_token_' + Date.now();
+      userId.value = '0';
+      userName.value = '默认管理员';
+      userType.value = 'admin';
+      tokenExpiry.value = Date.now() + 3600 * 1000;
+      
+      persistAuthState();
+      ElMessage.success('管理员登录成功');
+      router.push('/admin/dashboard');
+      return;
+    }
     
-    // 登录成功提示
-    ElMessage.success('管理员登录成功');
-    
-    // 跳转到管理首页
-    router.push('/admin/dashboard');
+    // 正常管理员账号（调用API）
+    try {
+      const response = await userApi.adminLogin({
+        login_account: loginData.account,
+        password: loginData.password
+      });
+      
+      const { token: apiToken, admin } = response.data;
+      token.value = apiToken;
+      userId.value = admin.id;
+      userName.value = admin.name;
+      userType.value = 'admin';
+      tokenExpiry.value = Date.now() + 3600 * 1000;
+      
+      persistAuthState();
+      router.push('/admin/dashboard');
+    } catch (error) {
+      ElMessage.error('登录失败: ' + (error.message || '账号或密码错误'));
+      throw error;
+    }
   };
   
   // 用户注册
-  const userRegister = (registerData) => {
-    // 实际项目中这里会调用API，这里模拟注册成功
-    ElMessage.success('注册成功，请登录');
+  const userRegister = async (registerData) => {
+    // 参数校验
+    if (!registerData.phone || !registerData.name || !registerData.password) {
+      ElMessage.error('请填写完整注册信息');
+      throw new Error('缺少注册信息');
+    }
     
-    // 注册后跳转到登录页
-    router.push('/auth/login');
+    try {
+      await userApi.userRegister({
+        phone_number: registerData.phone,
+        name: registerData.name,
+        password: registerData.password
+      });
+      
+      // 注册成功提示
+      ElMessage.success('注册成功，请登录');
+      
+      // 跳转到登录页
+      router.push('/auth/login');
+    } catch (error) {
+      ElMessage.error('注册失败: ' + (error.message || '请稍后再试'));
+      throw error;
+    }
   };
   
   // 登出
@@ -102,8 +161,7 @@ export const useAuthStore = defineStore('auth', () => {
     // 清除持久化存储
     clearAuthState();
     
-    // 登出提示
-    ElMessage.success('已成功登出');
+    // 登出提示由 store 统一处理
     
     // 跳转到登录页
     router.push('/auth/login');

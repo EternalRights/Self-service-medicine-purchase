@@ -1,0 +1,14 @@
+ssmp:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: localhost
+    port: 3306
+    database: ssmp
+    username: root
+    password: 2023158024
+
+  oss:
+    endpoint: oss-cn-beijing.aliyuncs.com
+    access-key-id: LTAI5tGzbkphKPu15ytRGaR9
+    access-key-secret: lY8zW6pz715Bg00yjKqR2UdFHcB7Q9
+    bucket-name: eternalrights-java

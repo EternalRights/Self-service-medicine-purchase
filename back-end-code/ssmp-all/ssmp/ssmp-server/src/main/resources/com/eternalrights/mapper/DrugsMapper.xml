@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eternalrights.mapper.DrugsMapper">
+
+    <sql id="baseColumn">
+        id, generic_name, image, category, specification, manufacturer,
+        composition, indications, usage_dosage, precautions, expiry_date,
+        shelf_status, stock_quantity, batch_number, create_user, create_time,
+        update_user, update_time
+    </sql>
+
+    <sql id="queryCondition">
+        <where>
+            <if test="query.keyword != null and query.keyword != ''">
+                AND (generic_name LIKE CONCAT('%', #{query.keyword}, '%')
+                OR manufacturer LIKE CONCAT('%', #{query.keyword}, '%'))
+            </if>
+            <if test="query.category != null">
+                AND category = #{query.category}
+            </if>
+            <if test="query.shelf_status != null">
+                AND shelf_status = #{query.shelf_status}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectDrugList" resultType="com.eternalrights.entity.Drug">
+        SELECT <include refid="baseColumn"/>
+        FROM drug
+        <include refid="queryCondition"/>
+        <choose>
+            <when test="query.sort == 'price_asc'">
+                ORDER BY stock_quantity ASC
+            </when>
+            <when test="query.sort == 'price_desc'">
+                ORDER BY stock_quantity DESC
+            </when>
+            <otherwise>
+                ORDER BY create_time DESC
+            </otherwise>
+        </choose>
+        <if test="query.page != null and query.pageSize != null">
+            LIMIT #{query.pageSize} OFFSET #{query.offset}
+        </if>
+    </select>
+
+    <select id="countDrugList" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM drug
+        <include refid="queryCondition"/>
+    </select>
+</mapper>

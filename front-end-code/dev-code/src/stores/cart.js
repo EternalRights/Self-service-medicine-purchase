@@ -31,12 +31,12 @@ export const useCartStore = defineStore('cart', () => {
   // 添加商品到购物车
   const addItem = (drug) => {
     if (!appStore.isOpen) {
-      ElMessage.warning('当前暂停营业，无法添加商品');
+      // 当前暂停营业警告由调用方处理
       return;
     }
     
     if (drug.stock_quantity <= 0) {
-      ElMessage.warning('该商品已售罄');
+      // 该商品已售罄警告由调用方处理
       return;
     }
     
@@ -46,9 +46,9 @@ export const useCartStore = defineStore('cart', () => {
       // 商品已存在，增加数量
       if (existingItem.quantity < drug.stock_quantity) {
         existingItem.quantity += 1;
-        ElMessage.success(`已增加 ${drug.generic_name} 数量`);
+        // 已增加商品数量提示由调用方处理
       } else {
-        ElMessage.warning('已达到库存上限');
+        // 已达到库存上限警告由调用方处理
       }
     } else {
       // 添加新商品
@@ -56,7 +56,7 @@ export const useCartStore = defineStore('cart', () => {
         drug: { ...drug },
         quantity: 1
       });
-      ElMessage.success(`已添加 ${drug.generic_name} 到购物车`);
+      // 已添加商品到购物车提示由调用方处理
     }
   };
   
@@ -69,7 +69,7 @@ export const useCartStore = defineStore('cart', () => {
         // 数量为0或负数，则移除商品
         removeItem(drugId);
       } else if (newQuantity > item.drug.stock_quantity) {
-        ElMessage.warning(`库存不足，最多可购买 ${item.drug.stock_quantity} 件`);
+        // 库存不足警告由调用方处理
         item.quantity = item.drug.stock_quantity;
       } else {
         item.quantity = newQuantity;
@@ -85,7 +85,7 @@ export const useCartStore = defineStore('cart', () => {
       if (item.quantity < item.drug.stock_quantity) {
         item.quantity += 1;
       } else {
-        ElMessage.warning('已达到库存上限');
+        // 已达到库存上限警告由调用方处理
       }
     }
   };
@@ -119,7 +119,7 @@ export const useCartStore = defineStore('cart', () => {
     
     if (index !== -1) {
       const removedItem = cartItems.value.splice(index, 1)[0];
-      ElMessage.success(`已移除 ${removedItem.drug.generic_name}`);
+      // 已移除商品提示由调用方处理
     }
   };
   
@@ -170,9 +170,9 @@ export const useCartStore = defineStore('cart', () => {
       // 清空购物车
       clearCart();
       
-      ElMessage.success('结算成功');
+      // 结算成功提示由调用方处理
     } catch (error) {
-      ElMessage.error('结算失败: ' + error.message);
+      // 结算失败提示由调用方处理
     } finally {
       loading.value = false;
     }
@@ -185,7 +185,7 @@ export const useCartStore = defineStore('cart', () => {
       const response = await get('/cart');
       cartItems.value = response.items;
     } catch (error) {
-      ElMessage.error('加载购物车失败: ' + error.message);
+      // 加载购物车失败提示由调用方处理
     } finally {
       loading.value = false;
     }
@@ -202,7 +202,7 @@ export const useCartStore = defineStore('cart', () => {
         }))
       });
     } catch (error) {
-      ElMessage.error('同步购物车失败: ' + error.message);
+      // 同步购物车失败提示由调用方处理
     } finally {
       loading.value = false;
     }

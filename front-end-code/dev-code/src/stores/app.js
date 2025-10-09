@@ -41,9 +41,9 @@ export const useAppStore = defineStore('app', () => {
       // 设置WebSocket实时同步
       setupWebSocket();
       
-      ElMessage.success('营业状态初始化成功');
+      // 营业状态初始化成功提示由调用方处理
     } catch (error) {
-      ElMessage.error('获取营业状态失败: ' + error.message);
+      // 获取营业状态失败提示由调用方处理
       // 回退到本地存储（仅当网络错误）
       const savedStatus = localStorage.getItem('business_status');
       if (savedStatus) businessStatus.value = savedStatus;
@@ -71,9 +71,9 @@ export const useAppStore = defineStore('app', () => {
       // 启动时间更新器
       startTimeUpdater();
       
-      ElMessage.success('应用状态初始化成功');
+      // 应用状态初始化成功提示由调用方处理
     } catch (error) {
-      ElMessage.error('获取应用状态失败: ' + error.message);
+      // 获取应用状态失败提示由调用方处理
     } finally {
       isLoading.value = false;
     }
@@ -91,10 +91,10 @@ export const useAppStore = defineStore('app', () => {
       // 持久化到本地存储
       localStorage.setItem('business_status', newStatus);
       
-      ElMessage.success(`营业状态已更新为: ${newStatus === BusinessStatus.OPEN ? '营业中' : '暂停营业'}`);
+      // 营业状态更新成功提示由调用方处理
       return true;
     } catch (error) {
-      ElMessage.error('更新营业状态失败: ' + error.message);
+      // 更新营业状态失败提示由调用方处理
       return false;
     } finally {
       isLoading.value = false;

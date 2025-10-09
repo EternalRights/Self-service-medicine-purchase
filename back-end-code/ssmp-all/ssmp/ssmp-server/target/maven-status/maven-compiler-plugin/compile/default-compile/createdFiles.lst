@@ -1,0 +1,6 @@
+com\eternalrights\SsmpServerApplication.class
+com\eternalrights\service\AuthService.class
+com\eternalrights\mapper\UserMapper.class
+com\eternalrights\service\impl\AuthServiceImpl.class
+com\eternalrights\controller\AuthController.class
+com\eternalrights\config\WebMvcConfiguration.class
