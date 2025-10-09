@@ -49,6 +49,7 @@
 - JWT鉴权
 - 阿里云OSS
 - MySQL
+- Redis
 
 **前端**：
 - Vue 3
