@@ -9,6 +9,6 @@ ssmp:
 
   oss:
     endpoint: oss-cn-beijing.aliyuncs.com
-    access-key-id: LTAI5tGzbkphKPu15ytRGaR9
-    access-key-secret: lY8zW6pz715Bg00yjKqR2UdFHcB7Q9
+    access-key-id: 
+    access-key-secret: 
     bucket-name: eternalrights-java
