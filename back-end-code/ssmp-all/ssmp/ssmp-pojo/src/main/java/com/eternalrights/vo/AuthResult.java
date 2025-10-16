@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AuthResult {
     private String token;
-    private long expiresIn;
+    private Integer expiresIn;
     private User user;
     private Boolean success;
 }

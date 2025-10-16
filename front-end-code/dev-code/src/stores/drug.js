@@ -15,11 +15,11 @@ export const useDrugStore = defineStore('drug', () => {
   // const categoryFilter = ref('all') // 已注释：分类筛选状态，暂保留字段以防后续需要
   
   // 获取药品列表
-  const fetchDrugs = async () => {
+  const loadDrugs = async () => {
     try {
       loading.value = true
-      const response = await fetchDrugs()
-      drugs.value = response.data
+      const data = await fetchDrugs()
+      drugs.value = data
     } catch (err) {
       error.value = err.message || '获取药品列表失败'
       console.error('获取药品列表失败:', err)
@@ -107,7 +107,7 @@ export const useDrugStore = defineStore('drug', () => {
     sortOption,
     // categoryFilter, 已从返回对象中移除
     filteredDrugs,
-    fetchDrugs,
+    loadDrugs,
     searchDrugs,
     setSortOption,
     // setCategoryFilter,

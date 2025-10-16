@@ -12,6 +12,12 @@ spring:
       url: jdbc:mysql://${ssmp.datasource.host}:${ssmp.datasource.port}/${ssmp.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
       username: ${ssmp.datasource.username}
       password: ${ssmp.datasource.password}
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 100MB
+
 
 mybatis:
   #mapper配置文件
@@ -44,3 +50,5 @@ aliyun:
     access-key-id: ${ssmp.oss.access-key-id}
     access-key-secret: ${ssmp.oss.access-key-secret}
     bucket-name: ${ssmp.oss.bucket-name}
+
+

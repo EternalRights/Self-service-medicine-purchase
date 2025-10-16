@@ -44,7 +44,7 @@
     },
     {
       "name": "ssmp.jwt.user-ttl",
-      "type": "java.lang.Long",
+      "type": "java.lang.Integer",
       "sourceType": "com.eternalrights.properties.JwtProperties"
     }
   ],

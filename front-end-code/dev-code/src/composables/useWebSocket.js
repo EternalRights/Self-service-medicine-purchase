@@ -54,16 +54,26 @@ export function useWebSocket(config) {
           onClose(event)
         }
         
-        // 自动重连机制
-        setTimeout(() => {
-          connect()
-        }, 5000)
+        // 仅在非正常关闭码时显示提示（1000为正常关闭）
+        if (event.code !== 1000) {
+          console.warn(`WebSocket异常关闭: ${event.code} ${event.reason}`)
+        }
+        
+        // 自动重连机制，避免频繁重试
+        if (![1001, 1006].includes(event.code)) { // 1001=服务重启, 1006=连接错误
+          setTimeout(() => {
+            connect()
+          }, 5000)
+        }
       }
 
       ws.value.onerror = (error) => {
         lastError.value = error
         console.error('WebSocket错误:', error)
-        ElMessage.error('WebSocket连接异常')
+        // 仅在未连接状态显示异常提示，避免与认证弹窗冲突
+        if (!isConnected.value && !isConnecting.value) {
+          ElMessage.error('WebSocket连接异常，请检查服务状态')
+        }
         if (typeof onError === 'function') {
           onError(error)
         }

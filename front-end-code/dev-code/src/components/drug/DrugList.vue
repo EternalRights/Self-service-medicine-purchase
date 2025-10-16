@@ -65,7 +65,7 @@ const categoryFilter = ref('all')
 const loading = ref(true)
 
 // 获取药品数据
-drugStore.fetchDrugs().finally(() => {
+drugStore.loadDrugs().finally(() => {
   loading.value = false
 })
 

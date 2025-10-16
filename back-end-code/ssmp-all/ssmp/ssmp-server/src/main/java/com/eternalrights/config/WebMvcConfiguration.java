@@ -1,5 +1,6 @@
 package com.eternalrights.config;
 
+import com.eternalrights.interceptor.JwtTokenAuthInterceptor;
 import com.eternalrights.json.JacksonObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,21 +17,21 @@ import java.util.List;
 @Configuration
 @Slf4j
 public class WebMvcConfiguration implements WebMvcConfigurer {
-//
-//    @Autowired
-//    private JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
-//
-//    /**
-//     * 注册自定义拦截器
-//     *
-//     * @param registry
-//     */
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        log.info("开始注册自定义拦截器...");
-//        registry.addInterceptor(jwtTokenAdminInterceptor)
-//                .addPathPatterns("/admin/**")
-//                .excludePathPatterns("/admin/employee/login");
-//    }
+
+    @Autowired
+    private JwtTokenAuthInterceptor jwtTokenAuthInterceptor;
+
+    /**
+     * 注册自定义拦截器
+     *
+     * @param registry
+     */
+    public void addInterceptors(InterceptorRegistry registry) {
+        log.info("开始注册自定义拦截器...");
+        registry.addInterceptor(jwtTokenAuthInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/auth/user/login");
+    }
 
     /**
      * 配置跨域资源共享(CORS)

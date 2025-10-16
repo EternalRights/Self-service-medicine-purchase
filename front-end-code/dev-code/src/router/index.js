@@ -161,6 +161,15 @@ router.beforeEach(async (to, from, next) => {
   
   // 检查路由是否需要认证
   if (to.meta.requiresAuth) {
+    console.log('路由守卫检查认证状态', { 
+      path: to.path, 
+      requiresAuth: to.meta.requiresAuth,
+      isLoggedIn: authStore.isLoggedIn,
+      token: authStore.token,
+      tokenExpiry: authStore.tokenExpiry,
+      now: Date.now()
+    });
+    
     // 检查用户是否登录
     if (!authStore.isLoggedIn) {
       // 未登录，重定向到登录页

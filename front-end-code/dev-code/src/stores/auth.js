@@ -13,8 +13,11 @@ export const useAuthStore = defineStore('auth', () => {
   const router = useRouter();
   
   // 状态定义
-  const token = ref(localStorage.getItem('medical_token') || null);
-  const tokenExpiry = ref(parseInt(localStorage.getItem('medical_token_expiry') || '0'));
+  const token = ref(localStorage.getItem('access_token') || null);
+  // 确保存储和读取的都是有效数字类型
+  const storedExpiryStr = localStorage.getItem('medical_token_expiry');
+  const storedExpiry = storedExpiryStr ? parseInt(storedExpiryStr, 10) : 0;
+  const tokenExpiry = ref(isNaN(storedExpiry) || storedExpiry <= 0 ? 0 : storedExpiry);
   const userId = ref(localStorage.getItem('medical_user_id') || null);
   const userName = ref(localStorage.getItem('medical_user_name') || null);
   const userType = ref(localStorage.getItem('medical_user_type') || null); // 'user' 或 'admin'
@@ -47,19 +50,23 @@ export const useAuthStore = defineStore('auth', () => {
     
     try {
       // 调用真实API
-      const response = await userApi.userLogin({
+      const result = await userApi.userLogin({
         phone_number: loginData.username,
         password: loginData.password
       });
       
-      // 假设API返回格式：{ token, user: { id, name, gender, age, phone } }
-      const { token: apiToken, user } = response.data;
+      // request.js已自动解包Result<T>，直接使用业务数据
+      // 修复：后端返回字段为 expires_in（含下划线），需保持命名一致
+      const { token: apiToken, expires_in, user } = result;
       
       token.value = apiToken;
       userId.value = user.id;
       userName.value = user.name;
       userType.value = 'user';
-      tokenExpiry.value = Date.now() + 3600 * 1000; // 可从token解析过期时间
+      // 使用正确的字段名 expires_in，并确保为数字类型
+      const expiryMs = parseInt(expires_in);
+      console.log('设置Token过期时间', { expires_in, expiryMs, now: Date.now(), expiryTime: Date.now() + expiryMs });
+      tokenExpiry.value = Date.now() + expiryMs;
       
       // 设置用户详细信息
       userGender.value = user.gender || null;
@@ -69,6 +76,8 @@ export const useAuthStore = defineStore('auth', () => {
       // 持久化存储
       persistAuthState();
       
+      // 确保存储完成后再跳转
+      await new Promise(resolve => setTimeout(resolve, 50));
       // 跳转到用户首页
       router.push('/user/home');
     } catch (error) {
@@ -186,7 +195,7 @@ export const useAuthStore = defineStore('auth', () => {
   
   // 持久化认证状态
   const persistAuthState = () => {
-    localStorage.setItem('medical_token', token.value);
+    localStorage.setItem('access_token', token.value);
     localStorage.setItem('medical_user_id', userId.value);
     localStorage.setItem('medical_user_name', userName.value);
     localStorage.setItem('medical_user_type', userType.value);
@@ -200,7 +209,7 @@ export const useAuthStore = defineStore('auth', () => {
   
   // 清除认证状态
   const clearAuthState = () => {
-    localStorage.removeItem('medical_token');
+    localStorage.removeItem('access_token');
     localStorage.removeItem('medical_user_id');
     localStorage.removeItem('medical_user_name');
     localStorage.removeItem('medical_user_type');
@@ -212,8 +221,26 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('medical_user_phone');
   };
   
-  // 初始化时检查token有效性
-  if (token.value && tokenExpiry.value <= Date.now()) {
+  // 初始化时检查token有效性，增强NaN和无效值处理
+  const now = Date.now();
+  const expiryValue = tokenExpiry.value;
+  
+  // 检查是否为有效数字且未过期
+  if (token.value && !isNaN(expiryValue) && expiryValue > 0 && expiryValue > now) {
+    console.log('恢复有效登录状态', { 
+      tokenExpiry: expiryValue, 
+      now, 
+      remaining: expiryValue - now,
+      isValid: true 
+    });
+  } else if (token.value) {
+    console.log('检测到无效或过期Token，清理认证状态', { 
+      token: token.value?.substring(0, 10) + '...', 
+      tokenExpiry: expiryValue, 
+      now, 
+      isExpired: expiryValue <= now,
+      isNaN: isNaN(expiryValue)
+    });
     clearAuthState();
   }
   

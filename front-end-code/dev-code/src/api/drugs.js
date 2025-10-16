@@ -58,7 +58,9 @@ export const getDrugCategories = () => {
  * @returns {Promise<import('@/types/api').ApiResponse<import('@/types/drug').Drug>>}
  */
 export const createDrug = (data) => {
-  return request.post('/drugs', data)
+  // 如果是FormData，则不需要手动设置Content-Type
+  const config = data instanceof FormData ? { headers: { 'Content-Type': undefined } } : {}
+  return request.post('/drugs', data, config)
 }
 
 /**
@@ -68,7 +70,9 @@ export const createDrug = (data) => {
  * @returns {Promise<import('@/types/api').ApiResponse<import('@/types/drug').Drug>>}
  */
 export const updateDrug = (id, data) => {
-  return request.put(`/drugs/${id}`, data)
+  // 如果是FormData，则不需要手动设置Content-Type
+  const config = data instanceof FormData ? { headers: { 'Content-Type': undefined } } : {}
+  return request.put(`/drugs/${id}`, data, config)
 }
 
 /**

@@ -69,7 +69,7 @@ service.interceptors.request.use(
     // Token 处理
     if (checkTokenValidity()) {
       const authStore = useAuthStore()
-      config.headers.Authorization = `Bearer ${authStore.token}`
+      config.headers['Authorization'] = `Bearer ${authStore.token}`
       config.headers['X-User-Id'] = authStore.userId
       config.headers['X-User-Name'] = encodeURIComponent(authStore.userName || '')
     }
@@ -128,7 +128,8 @@ service.interceptors.response.use(
       
       // 业务成功（code为1表示成功）
       if (code === 1) {
-        return data.data // 直接返回解包后的业务数据
+        console.log('✅ API响应解包成功', { url: response.config.url, data: data.data });
+        return data.data; // 直接返回解包后的业务数据
       }
       
       // 业务错误处理
@@ -176,13 +177,18 @@ service.interceptors.response.use(
     
     switch (status) {
       case 401:
-        // 未授权，清除登录状态
+        // 未授权，仅当token有效但被拒绝时才登出
         const authStore = useAuthStore()
-        authStore.logout()
-        ElMessage.error('登录已过期，请重新登录')
-        setTimeout(() => {
-          window.location.href = '/auth/login'
-        }, 1500)
+        // 检查是否已有有效token，防止登录过程中的误判
+        // 根据前端会话保持原则，区分真正过期与临时异常
+        const isTokenExpired = authStore.tokenExpiry <= Date.now();
+        if (isTokenExpired) {
+          authStore.logout();
+          ElMessage.error('登录已过期，请重新登录');
+          setTimeout(() => {
+            window.location.href = '/auth/login';
+          }, 1500);
+        }
         break
         
       case 403:

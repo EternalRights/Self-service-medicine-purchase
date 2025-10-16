@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Data
 public class JwtProperties {
     private String userSecretKey;
-    private long userTtl;
+    private Integer userTtl;
     private String userTokenName;
 
 }
